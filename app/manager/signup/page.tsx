@@ -6,12 +6,12 @@ import { Eye, EyeOff, Heart, User, Mail, Lock, Phone, Droplet, UserCheck } from 
 import { z } from 'zod';
 import axios from 'axios';
 
-// Zod Schema - এটা আপনার CreateUserDto এর মতোই
 const signupSchema = z.object({
   name: z
     .string().nonempty("Name is required")
     .min(2, { message: "Name must be at least 2 characters long" })
     .max(50, { message: "Name cannot exceed 50 characters" })
+    .regex(/^[A-Za-z\s]+$/, { message: "Name can only contain letters and space)" })
     .trim(),
   
   email: z
@@ -37,9 +37,9 @@ const signupSchema = z.object({
       message: "Blood type must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-"
     })
     .optional()
-    .or(z.literal('')), // Empty string allowed for optional field
+    .or(z.literal('')), 
   
-  userType: z.literal('donor'), // Fixed as donor
+  userType: z.literal('donor'), 
   
   roleId: z
     .number()
@@ -47,12 +47,10 @@ const signupSchema = z.object({
     .min(1, { message: "Role ID must be greater than 0" })
 });
 
-// TypeScript type from Zod schema
 type SignupFormData = z.infer<typeof signupSchema>;
 
-// Configure axios base URL
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000', // আপনার backend URL
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000', 
   headers: {
     'Content-Type': 'application/json',
   },
@@ -65,7 +63,7 @@ export default function SignUp() {
     password: '',
     phoneNumber: '',
     bloodType: '',
-    userType: 'donor',
+    userType: 'manager',
     roleId: 1
   });
   
@@ -80,7 +78,7 @@ export default function SignUp() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    // Convert roleId to number
+
     const newValue = name === 'roleId' ? Number(value) : value;
     
     setFormData(prev => ({
@@ -88,7 +86,6 @@ export default function SignUp() {
       [name]: newValue
     }));
 
-    // Clear errors when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -96,20 +93,19 @@ export default function SignUp() {
       }));
     }
     
-    // Clear API error and success message
+    
     if (apiError) setApiError('');
     if (successMessage) setSuccessMessage('');
   };
 
   const validateForm = (): boolean => {
     try {
-      // Validate using Zod schema
+      
       signupSchema.parse(formData);
-      setErrors({}); // Clear all errors
+      setErrors({}); 
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        // Convert Zod errors to our error format
         const newErrors: Record<string, string> = {};
         error.issues.forEach((err) => {
           if (err.path.length > 0) {
@@ -123,11 +119,9 @@ export default function SignUp() {
   };
 
   const handleSubmit = async () => {
-    // Clear previous messages
+
     setApiError('');
     setSuccessMessage('');
-
-    // Validate form before submission
     if (!validateForm()) {
       return;
     }
@@ -135,21 +129,18 @@ export default function SignUp() {
     setIsLoading(true);
     
     try {
-      // Prepare data for API (remove empty bloodType if not selected)
       const submitData = {
         ...formData,
         bloodType: formData.bloodType || undefined
       };
 
-      // Call your backend API
       const response = await api.post('/manager/createmanagerUser', submitData);
       
       console.log('User created successfully:', response.data);
-      
-      // Show success message
+     
       setSuccessMessage('Account created successfully! Please check your email for verification.');
       
-      // Optional: Reset form after successful submission
+
       setFormData({
         name: '',
         email: '',
@@ -160,28 +151,20 @@ export default function SignUp() {
         roleId: 1
       });
 
-      // Optional: Redirect to signin page after success
-      // setTimeout(() => {
-      //   window.location.href = '/signin';
-      // }, 2000);
-
     } catch (error) {
       console.error('Signup error:', error);
       
-      // Handle different types of errors
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          // Server responded with error status
+        
           const { status, data } = error.response;
           
           switch (status) {
             case 400:
-              // Validation errors from backend
+            
               if (data.message && Array.isArray(data.message)) {
-                // Handle validation pipe errors
                 const backendErrors: Record<string, string> = {};
                 data.message.forEach((msg: string) => {
-                  // Parse validation messages and map to form fields
                   if (msg.includes('email')) backendErrors.email = msg;
                   else if (msg.includes('password')) backendErrors.password = msg;
                   else if (msg.includes('name')) backendErrors.name = msg;
@@ -207,10 +190,9 @@ export default function SignUp() {
               setApiError(data.message || 'An unexpected error occurred. Please try again.');
           }
         } else if (error.request) {
-          // Request made but no response received
+          
           setApiError('Unable to connect to server. Please check your internet connection.');
         } else {
-          // Something else happened
           setApiError('An unexpected error occurred. Please try again.');
         }
       } else {
@@ -224,7 +206,7 @@ export default function SignUp() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
+        
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-red-500 rounded-full mb-4">
             <Droplet className="w-8 h-8 text-white" />
@@ -235,7 +217,6 @@ export default function SignUp() {
 
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Success Message */}
           {successMessage && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-green-800 text-sm">{successMessage}</p>
