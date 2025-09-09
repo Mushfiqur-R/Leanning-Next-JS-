@@ -1,3 +1,4 @@
+// File: app/manager/dashboard/page.tsx (Updated version)
 "use client"
 import { useState } from 'react';
 import { 
@@ -20,6 +21,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // Add this import
 
 export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -30,13 +32,13 @@ export default function Dashboard() {
 
   type UrgencyLevel = 'low' | 'medium' | 'high' | 'critical'|string;
    type BloodRequest = {
-  id: number; // usually added by backend
-  patientName: string; // if patient name exists in frontend
+  id: number;
+  patientName: string;
   bloodType: string;
   urgencyLevel: UrgencyLevel
   hospitalName: string;
   hospitalAddress: string;
-  neededBy: string; // store as string in frontend for display
+  neededBy: string;
   unitsNeeded?: number;
   status?: 'active' | 'fulfilled' | 'cancelled' | 'expired'| string;
   createdAt?: string;
@@ -74,36 +76,42 @@ export default function Dashboard() {
     unitsNeeded: 1,
     status: 'fulfilled',
     createdAt: '2025-01-10',
-    
-   
   },
   {
     id: 3,
-    patientName: 'ফাতেমা খাতুন',
-    bloodType: 'A+',
-    urgencyLevel: 'medium',
-    hospitalName: 'বঙ্গবন্ধু শেখ মুজিব মেডিকেল বিশ্ববিদ্যালয়',
+    patientName: 'করিম মিয়া',
+    bloodType: 'B-',
+    urgencyLevel: 'high',
+    hospitalName: 'স্কয়ার হাসপাতাল',
     hospitalAddress: 'Dhaka Address Here',
-    neededBy: '2025-01-14',
-    unitsNeeded: 1,
-    status: 'fulfilled',
-    createdAt: '2025-01-10',
-    
-   
+    neededBy: '2025-01-16',
+    unitsNeeded: 3,
+    status: 'active',
+    createdAt: '2025-01-11',
+  },{
+    id: 4,
+    patientName: 'করিম মিয়া',
+    bloodType: 'B-',
+    urgencyLevel: 'high',
+    hospitalName: 'স্কয়ার হাসপাতাল',
+    hospitalAddress: 'Dhaka Address Here',
+    neededBy: '2025-01-16',
+    unitsNeeded: 3,
+    status: 'active',
+    createdAt: '2025-01-11',
   }
   ];
    const router = useRouter();
    const handleCreate = () => {
-    setShowCreateModal(false); // modal বন্ধ করে দেবে
-    router.push("/manager/CreateBloodRequest"); // ওই পেজে নিয়ে যাবে
+    setShowCreateModal(false);
+    router.push("/manager/CreateBloodRequest");
   };
-
 
   const getStatusColor = (status:string) => {
     switch (status) {
-      case 'Active': return 'bg-green-100 text-green-800';
-      case 'Completed': return 'bg-blue-100 text-blue-800';
-      case 'Cancelled': return 'bg-red-100 text-red-800';
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'fulfilled': return 'bg-blue-100 text-blue-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -112,7 +120,7 @@ export default function Dashboard() {
     switch (urgency) {
       case 'critical': return 'text-red-600';
       case 'high': return 'text-orange-600';
-      case 'moderate': return 'text-yellow-600';
+      case 'medium': return 'text-yellow-600';
       default: return 'text-green-600';
     }
   };
@@ -235,7 +243,7 @@ export default function Dashboard() {
                 >
                   <option value="all">All Status</option>
                   <option value="active">Active</option>
-                  <option value="completed">Completed</option>
+                  <option value="fulfilled">fulfilled</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
                 <button className="px-3 py-2 text-gray-600 hover:text-red-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
@@ -268,7 +276,12 @@ export default function Dashboard() {
                           <Droplets className="h-5 w-5 text-red-600" />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{request.patientName}</div>
+                          <Link 
+                            href={`/manager/blood-request/${request.id}`}
+                            className="hover:text-red-600 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-gray-900 hover:text-red-600 cursor-pointer">{request.patientName}</div>
+                          </Link>
                           <div className="text-sm text-gray-500 flex items-center">
                             <MapPin className="h-3 w-3 mr-1" />
                             {request.hospitalAddress}
@@ -308,12 +321,15 @@ export default function Dashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
-                        <button 
-                          className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
-                          title="View Details"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
+                        {/* <Link href={`/manager/blood-request/${request.id}`}> */}
+                          <button 
+                            onClick={() => router.push(`/manager/blood-request/${request.id}`)}
+                            className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
+                            title="View Details"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                        {/* </Link> */}
                         <button 
                           onClick={() => {
                             setSelectedRequest(request);
@@ -327,6 +343,12 @@ export default function Dashboard() {
                         <button 
                           className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"
                           title="Delete Request"
+                          onClick={() => {
+                            if (confirm('Are you sure you want to delete this request?')) {
+                              // Handle delete logic here
+                              console.log('Deleting request:', request.id);
+                            }
+                          }}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -357,8 +379,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Create Modal (Hidden by default) */}
-
+      {/* Create Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -379,7 +400,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Edit Modal (Hidden by default) */}
+      {/* Edit Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">

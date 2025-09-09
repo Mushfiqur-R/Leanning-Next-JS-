@@ -42,7 +42,7 @@ export default function Navigation() {
                 <div className="bg-red-600 p-2 rounded-lg">
                   <Droplets className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xl font-bold text-gray-900">BloodConnect</span>
+                <span className="text-xl font-bold text-gray-900">LifeConnect</span>
                 <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">Manager</span>
               </div>
             </div>
