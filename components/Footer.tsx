@@ -1,4 +1,11 @@
+"use client"
+import { usePathname } from "next/navigation";
+
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Hide footer on /loginprofile
+  const showFooter = pathname !== "/loginprofile";
   return (
     <footer className="bg-background border-t border-foreground/10 py-8 mt-auto">
       <div className="container mx-auto px-4">

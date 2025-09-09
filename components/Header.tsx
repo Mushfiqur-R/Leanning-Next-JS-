@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 export default function Header() {
+  
   return (
     <header className="bg-background border-b border-foreground/10 py-4">
       <div className="container mx-auto px-4">
