@@ -15,6 +15,7 @@ import {
   Droplets,
   ChevronDown
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Navigation() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -121,10 +122,10 @@ export default function Navigation() {
                     </div>
                   </div>
                   
-                  <a href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <Link href="/manager/ViewProfile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     <User className="h-4 w-4 mr-3" />
                     View Profile
-                  </a>
+                  </Link>
                   <a href="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     <Settings className="h-4 w-4 mr-3" />
                     Account Settings
